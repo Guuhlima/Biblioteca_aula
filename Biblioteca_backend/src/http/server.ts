@@ -26,8 +26,10 @@ export async function buildServer() {
   const hasher = new BcryptHasher(10);
   const registerUser = new RegisterUser(usersRepo, hasher, () => randomUUID());
 
-  app.post("/users", makeRegisterHandler(registerUser));
-  app.get("/health", async () => ({ ok: true }));
+  await app.register(async (r) => {
+    r.post("/users", makeRegisterHandler(registerUser));
+    r.get("/health", async () => ({ ok: true }));
+  }, { prefix: "/api" });
 
   return app;
 }
