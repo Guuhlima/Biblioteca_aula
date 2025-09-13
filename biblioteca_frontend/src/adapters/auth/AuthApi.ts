@@ -3,17 +3,22 @@ import { IAuthRepository } from "@/core/auth/ports";
 import { Session } from "@/core/auth/models";
 
 export class AuthApi implements IAuthRepository {
-    constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-    login(email: string, password: string): Promise<Session> {
-        return this.http.post("/api/sessions", { email, password });
-    }
+  login(email: string, password: string): Promise<Session> {
+    return this.http.post("/sessions", { email, password })
+  }
 
-    logout(): Promise<void> {
-        return this.http.del("/api/sessions");
-    }
+  async logout(): Promise<void> {
+    await this.http.del("/sessions")
+  }
 
-    getSession(): Promise<Session | null> {
-        return this.http.get("/api/me")
+  async getSession(): Promise<Session | null> {
+    try {
+      const { user } = await this.http.get<{ user: Session["user"] }>("/me")
+      return { user, token: "" }
+    } catch {
+      return null
     }
+  }
 }

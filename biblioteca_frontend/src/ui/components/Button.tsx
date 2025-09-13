@@ -4,27 +4,19 @@ type Props = ComponentProps<"button"> & {
   loading?: boolean;
 };
 
-export function Button({
-  loading = false,
-  className = "",
-  children,
-  disabled,
-  ...rest
-}: Props) {
+export function Button({ className = "", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={`px-4 py-2 rounded-lg bg-base-600 text-white font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-      disabled={loading || disabled}
-      {...rest}
+      {...props}
+      className={
+        "group relative w-full overflow-hidden rounded-lg bg-white/10 px-4 py-2 font-medium text-white backdrop-blur " +
+        "border border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.25)] transition " +
+        "hover:bg-white/15 active:scale-[0.99] disabled:opacity-50 " +
+        className
+      }
     >
-      {loading ? (
-        <span className="flex items-center gap-2">
-          <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-          Carregando...
-        </span>
-      ) : (
-        children
-      )}
+      <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition group-hover:translate-x-0" />
+      <span className="relative">{props.children}</span>
     </button>
   );
 }

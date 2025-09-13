@@ -1,4 +1,6 @@
 import fastify from "fastify";
+import cors from "@fastify/cors";
+import cookie from "@fastify/cookie";
 import { randomUUID } from "crypto";
 
 import { RegisterUser } from "../usecases/RegisterUser";
@@ -7,23 +9,34 @@ import { makeRegisterHandler } from "./controllers/registerUser";
 import { PrismaUserRepository } from "../infra/repo/PrismaUserRepository";
 
 export async function buildServer() {
-    const app = fastify({ logger: true })
+  const app = fastify({ logger: true });
 
-    const usersRepo = new PrismaUserRepository();
-    const hasher = new BcryptHasher(10);
-    const registerUser = new RegisterUser(usersRepo, hasher, () => randomUUID());
+  await app.register(cors, {
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  });
 
-    app.post('/users', makeRegisterHandler(registerUser));
-    app.get('/health', async () => ({ ok: true }));
+  await app.register(cookie, {
+    secret: process.env.COOKIE_SECRET || "dev-cookie",
+  });
 
-    return app;
+  const usersRepo = new PrismaUserRepository();
+  const hasher = new BcryptHasher(10);
+  const registerUser = new RegisterUser(usersRepo, hasher, () => randomUUID());
+
+  app.post("/users", makeRegisterHandler(registerUser));
+  app.get("/health", async () => ({ ok: true }));
+
+  return app;
 }
 
 if (require.main === module) {
-    (async () => {
-        const app = await buildServer();
-        const port = Number(process.env.PORT ?? 3333 );
-        await app.listen({ port, host: '0.0.0.0' });
-        app.log.info(`listening on http://localhost:${port}`);
-    })();
+  (async () => {
+    const app = await buildServer();
+    const port = Number(process.env.PORT ?? 3333);
+    await app.listen({ port, host: "0.0.0.0" });
+    app.log.info(`listening on http://localhost:${port}`);
+  })();
 }

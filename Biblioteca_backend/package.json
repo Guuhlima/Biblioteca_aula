@@ -18,6 +18,8 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.1.0",
     "@prisma/client": "^6.16.1",
     "@sinclair/typebox": "^0.34.9",
     "bcrypt": "^6.0.0",
