@@ -28,7 +28,6 @@ export async function buildServer() {
 
   await app.register(async (r) => {
     r.post("/users", makeRegisterHandler(registerUser));
-    r.get("/health", async () => ({ ok: true }));
   }, { prefix: "/api" });
 
   return app;
