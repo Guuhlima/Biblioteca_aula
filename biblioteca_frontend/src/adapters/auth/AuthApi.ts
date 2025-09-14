@@ -6,11 +6,11 @@ export class AuthApi implements IAuthRepository {
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Promise<Session> {
-    return this.http.post("/sessions", { email, password })
+    return this.http.post("/api/sessions", { email, password })
   }
 
   async logout(): Promise<void> {
-    await this.http.del("/sessions")
+    await this.http.del("/api/sessions")
   }
 
   async getSession(): Promise<Session | null> {

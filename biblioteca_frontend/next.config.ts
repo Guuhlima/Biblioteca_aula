@@ -1,13 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    // Não falhar o build por erros de ESLint
-    ignoreDuringBuilds: true,
-  },
-  // (opcional, não recomendo a longo prazo)
-  // typescript: {
-  //   ignoreBuildErrors: true,
-  // },
+  eslint: { ignoreDuringBuilds: true },
+  // NADA de `output: "export"`, nada de `basePath`, nada de rewrites/redirects agora
 };
-
 module.exports = nextConfig;

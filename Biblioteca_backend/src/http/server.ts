@@ -7,6 +7,9 @@ import { RegisterUser } from "../usecases/RegisterUser";
 import { BcryptHasher } from "../infra/crypto/BcryptHasher";
 import { makeRegisterHandler } from "./controllers/registerUser";
 import { PrismaUserRepository } from "../infra/repo/PrismaUserRepository";
+import { JwtTokenProvider } from "../infra/crypto/JwtTokenProvider";
+import { CreateSession } from "../usecases/CreateSession";
+import { makeSessionHandler } from "../http/controllers/makeSession";
 
 export async function buildServer() {
   const app = fastify({ logger: true });
@@ -25,9 +28,13 @@ export async function buildServer() {
   const usersRepo = new PrismaUserRepository();
   const hasher = new BcryptHasher(10);
   const registerUser = new RegisterUser(usersRepo, hasher, () => randomUUID());
+  const tokenProvider = new JwtTokenProvider(process.env.JWT_SECRET ?? "dev-secret");
+  const createSession = new CreateSession(usersRepo, hasher, tokenProvider);
+  const handler = makeSessionHandler(createSession);
 
   await app.register(async (r) => {
     r.post("/users", makeRegisterHandler(registerUser));
+    r.post("/sessions", handler)
   }, { prefix: "/api" });
 
   return app;
