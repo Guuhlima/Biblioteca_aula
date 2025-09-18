@@ -17,7 +17,7 @@ export const makeRegisterHandler = (usecase: RegisterUser) =>
         try {
             const { nome, email, password } = parsed.data;
             const out = await usecase.execute({ nome, email, password });
-            return reply.status(201).send({ id: out.id })
+            return reply.status(201).send({ message: "Usuario criado com sucesso" })
         } catch (err: any) {
             if (err?.message === 'EMAIL JA EXISTE') {
                 return reply.status(409).send({ error: 'EMAIL JA EXISTE'});
